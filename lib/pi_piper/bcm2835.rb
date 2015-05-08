@@ -75,6 +75,34 @@ module PiPiper
       self.gpio_level(pin) == PinValues::GPIO_HIGH
     end
 
+    # Sets the Function Event register for the given pin. #TODO add asynchrone detect, and disable event
+    attach_function :gpio_event_low,       :bcm2835_gpio_len,    [:uint8], :void
+    attach_function :gpio_event_high,      :bcm2835_gpio_hen,    [:uint8], :void
+    attach_function :gpio_event_rising,    :bcm2835_gpio_ren,    [:uint8], :void
+    attach_function :gpio_event_falling,   :bcm2835_gpio_fen,    [:uint8], :void
+
+    attach_function :gpio_event_status,    :bcm2835_gpio_eds,    [:uint8], :uint8
+    attach_function :gpio_event_set_status,:bcm2835_gpio_set_eds,[:uint8], :void
+
+    attach_function :gpio_event_clear_low,    :bcm2835_gpio_len, [:uint8], :void
+    attach_function :gpio_event_clear_high,   :bcm2835_gpio_hen, [:uint8], :void
+    attach_function :gpio_event_clear_rising, :bcm2835_gpio_ren, [:uint8], :void
+    attach_function :gpio_event_clear_falling,:bcm2835_gpio_fen, [:uint8], :void
+
+    def self.pin_set_trigger(pin, trigger)
+      self.gpio_event_low(pin)     if [:low].include? trigger
+      self.gpio_event_high(pin)    if [:high].include? trigger
+      self.gpio_event_rising(pin)  if [:both, :rising].include? trigger
+      self.gpio_event_falling(pin) if [:both, :falling].include? trigger
+    end
+
+    def self.pin_clear_trigger(pin, trigger = :all)
+      self.gpio_event_clear_low(pin)     if [:all, :low].include? trigger
+      self.gpio_event_clear_high(pin)    if [:all, :high].include? trigger
+      self.gpio_event_clear_rising(pin)  if [:all, :rising].include? trigger
+      self.gpio_event_clear_falling(pin) if [:all, :falling].include? trigger
+    end
+
     #NOTE to use: chmod 666 /dev/spidev0.0
     def self.spidev_out(array)
       File.open('/dev/spidev0.0', 'wb'){|f| f.write(array.pack('C*')) }
