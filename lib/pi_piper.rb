@@ -1,5 +1,14 @@
 require 'eventmachine'
-Dir[File.dirname(__FILE__) + '/pi_piper/*.rb'].each {|file| require file unless file.end_with?('bcm2835.rb') }
+
+require 'pi_piper/version'
+require 'pi_piper/platform'
+require 'pi_piper/frequency'
+require 'pi_piper/pin'
+require 'pi_piper/pin_error'
+require 'pi_piper/pin_values'
+require 'pi_piper/i2c'
+require 'pi_piper/spi'
+
 
 module PiPiper
   extend self
